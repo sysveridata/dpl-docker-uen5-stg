@@ -1,0 +1,38 @@
+# See: https://hub.docker.com/r/microsoft/mssql-server
+# BCP: /opt/mssql-tools18/bin/bcp "SELECT * FROM [bd1].[dbo].[Employees]" queryout "/bcp/employees.bck" -S localhost -U sa -P ${MSSQL_SA_PASSWORD} -t @@@@ -c -k -u
+
+secrets:
+    mssql_sa_password:
+      file: /data/secrets/sys-docker-sqlserver-2019/mssql_sa_password
+
+services:
+  # database service
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    hostname: sqlserver-2019
+    container_name: sqlserver-2019
+    ports:
+      - "14319:1433"
+    restart: always
+    mem_limit: "4g"
+    # cpus: "3"
+    secrets:
+      - mssql_sa_password
+    environment:
+      - TZ=Europe/Madrid
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/mssql_sa_password
+      # SQL Server version
+      - MSSQL_PID=Developer
+      # Backups directory
+      - MSSQL_BACKUP_DIR=/backups
+    volumes:
+      # SQL Server Data (chown -R 10001:10001 data/)
+      - /data/volumes/sys-docker-sqlserver-2019/data:/var/opt/mssql
+      # BCP Bulk Operations
+      - /data/volumes/sys-docker-sqlserver-2019/bcp:/bcp
+      # Shared directory (general purpose)
+      - /data/volumes/sys-docker-sqlserver-2019/shared:/shared
+      # Backups directory
+      - /backups/backdbs:/backups/backdbs
+
