@@ -22,6 +22,7 @@ services:
       - TZ=Europe/Madrid
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/mssql_sa_password
+      - MSSQL_AGENT_ENABLED=true
       # SQL Server version
       - MSSQL_PID=Developer
       # Backups directory
